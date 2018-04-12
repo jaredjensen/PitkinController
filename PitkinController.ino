@@ -1,7 +1,7 @@
 #define switchPin 0
 #define pwmPin 1
 int powerLevel = 0;
-unsigned long timeStamp = 0;
+unsigned long lastTime = 0;
 
 void setup()
 {
@@ -17,7 +17,7 @@ void loop()
 	while (isSwitchOn()) {
 		setPowerLevel(powerLevel);
 
-		unsigned long millisecondsOff = currentTime - timeStamp;
+		unsigned long millisecondsOff = currentTime - lastTime;
 
 		if (millisecondsOff > 10000) {
 			reset();
@@ -30,7 +30,7 @@ void loop()
 			powerLevel = output.length - 1;
 		}
 
-		timeStamp = millis();
+		lastTime = millis();
 	}
 
 	//when the switchPin goes high and the while loop exits, immediately turn the PWM off
