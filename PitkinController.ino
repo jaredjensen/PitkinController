@@ -46,7 +46,7 @@ bool isLowestSetting(int level) {
 }
 
 void reset() {
-	mode = 0;
+	powerLevel = 0;
 }
 
 void setPowerLevel(int level) {
