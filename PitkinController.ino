@@ -1,6 +1,6 @@
 #define switchPin 0
 #define pwmPin 1
-int mode = 0;
+int powerLevel = 0;
 unsigned long timeStamp = 0;
 
 void setup()
@@ -12,34 +12,41 @@ void setup()
 
 void loop()
 {
-	//get currentTime (since on) at the start of each loop
 	unsigned long currentTime = millis();
 
-	//when the switchPin is LOW the switch is in the ON position
-	while (digitalRead(switchPin) == LOW) {
-		setPowerLevel(mode);
+	while (isSwitchOn()) {
+		setPowerLevel(powerLevel);
 
-		//if the switch has been off for more than 10 seconds reset to mode 0;
-		if ((currentTime - timeStamp) > 10000) {
-			mode = 0;
+		unsigned long millisecondsOff = currentTime - timeStamp;
+
+		if (millisecondsOff > 10000) {
+			reset();
+		}
+		else if (millisecondsOff > 200) {
+			powerLevel++;
 		}
 
-		//else if the switch has been off for more than 200 milliseconds advance to the next mode
-		else if ((currentTime - timeStamp) > 200) {
-			mode++;
+		if (isLowestSetting(powerLevel)) {
+			powerLevel = output.length - 1;
 		}
 
-		//if already in mode 3 (the lowest setting), stay there
-		if (mode > 3) {
-			mode = 3;
-		}
-
-		//update the timeStamp each time you reach the end of the while loop
 		timeStamp = millis();
 	}
 
 	//when the switchPin goes high and the while loop exits, immediately turn the PWM off
 	setPowerLevel(0);
+}
+
+bool isSwitchOn() {
+	return digitalRead(switchPin) == LOW;
+}
+
+bool isLowestSetting(int level) {
+	return level >= output.length - 1;
+}
+
+void reset() {
+	mode = 0;
 }
 
 void setPowerLevel(int level) {
